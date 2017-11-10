@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Goldman Map Creator</title>
+    <link rel="stylesheet" type="text/css" href="common.css">
+    <script type="text/javascript" src="scripts/jquery-1.2.1.js"></script>
+    <script type="text/javascript" src="scripts/support.labs.js"></script>
+    <script type="text/javascript" src="scripts/ui.mouse.js"></script>
+    <script type="text/javascript" src="scripts/ui.draggable.js"></script>
+    <script type="text/javascript" src="scripts/ui.draggable.ext.js"></script>
+    <script type="text/javascript" src="scripts/ui.droppable.js"></script>
+    <script type="text/javascript" src="scripts/ui.droppable.ext.js"></script>
+  </head>
+<body>
+    <h2>Goldman Map Creator</h2>
+    <fieldset id="SubjectContainer">
+      <legend>Map</legend>
+      <div id="Draggables">
+        <img src="img/wall.png" class="wall"/>
+        <img src="img/monster.png" class="monster"/>
+        <img src="img/goldman.png" class="goldman"/>
+        <img src="img/silver.png" class="silver"/>
+        <img src="img/gold.png" class="gold"/>
+        <img src="img/diamond.png" class="diamond"/>
+        <img src="img/nothing.png" class="nothing"/>
+        <img src="img/exit.png" class="exit"/>
+        <img src="img/keygreen.png" class="keygreen"/>
+		<img src="img/lockgreen.png" class="lockgreen"/>
+        <img src="img/keyblue.png" class="keyblue"/>
+		<img src="img/lockblue.png" class="lockblue"/>
+        <img src="img/keyred.png" class="keyred"/>
+		<img src="img/lockred.png" class="lockred"/>        
+		<br/>
+		<hr size="-1" align="left" style="width:100px;color:navy">
+		<br/>
+		
+		<button id="fill_walls">создать рамку</button>
+		<button id="clear">очистить карту</button>
+		<br><br>
+		<button onClick="map_export()">экспорт карты</button><br/>
+		<button id="mapimport">импорт карты</button>
+      </div>
+      <div id="Droppables" class="droppableContainer">
+      </div>
+    </fieldset>
+	<textarea id="map" cols="100" rows="10"></textarea>	
+<script type="text/javascript">
+$(function(){
+	var map = '';
+	$('#Draggables img').draggable({
+	  ghosting: true,
+	  opacity: 0.5,
+	  revert: true
+	});
+	var options = {};
+	options.accept = ".wall,.nothing,.monster,.goldman,.silver,.gold,.diamond,.exit,.lockgreen,.lockblue,.lockred,.keygreen,.keyblue,.keyred";
+	options.activate = function(){throb('div.activate');};
+	options.deactivate = function(){throb('div.deactivate');};
+	options.over = function(){throb('div.over');};
+	options.out = function(){throb('div.out');};
+	options.drop = function(event,info){
+	throb('div.drop');
+	this.src = info.element.src;
+	};
+	clear_map();
+	$("#clear").click(function(){clear_map()});
+	$("#fill_walls").click(function(){fill_with_walls()});
+	$("#mapimport").click(function(){map_import($('#map').html())});
+	function clear_map(){
+		$("#Droppables").html('');
+		for(var i = 1; i <= 132; i++) {
+			$('#Droppables').append('<img src="img/nothing.png" class="td" alt="drop zone" id="dropZone'+i+'"/>'); 
+			$('#dropZone'+i).droppable(options);
+		}
+	};
+	function fill_with_walls(){
+		$("#Droppables").html('');
+		var ramka = [1,2,3,4,5,6,7,8,9,10,11,12,22,23,33,34,44,45,55,56,66,67,77,78,88,89,99,100,110,111,121,122,123,124,125,126,127,128,129,130,131,132];
+		for(var i = 1; i <= 132; i++) {
+			var is_border = false
+			for(var k=0; k<ramka.length; k++) {
+				if(ramka[k] == i) {
+					is_border = true;
+					break;
+				}	
+			}
+			if(is_border) $('#Droppables').append('<img src="img/wall.png" class="td" alt="drop zone" id="dropZone'+i+'"/>'); 
+			else $('#Droppables').append('<img src="img/nothing.png" class="td" alt="drop zone" id="dropZone'+i+'"/>'); 	
+			$('#dropZone'+i).droppable(options);
+		}
+	};
+	function map_import(map){
+		if (map){
+		var Map = map.split(',');
+			$("#Droppables").html('');
+			for(var i=1; i<=132; i++) {
+				$('#Droppables').append('<img src="img/'+Map[i-1]+'.png" class="td" alt="drop zone" id="dropZone'+i+'"/>'); 
+				$('#dropZone'+i).droppable(options);
+			}
+		} else alert('Загрузите карту в textarea');
+	};
+});
+
+  function throb(element) {
+	$(element).animate({opacity:1.0},250,function(){$(this).animate({opacity:0.5},500);});
+  }
+  
+  function map_export(){
+	map = "";
+	$('.td').each(function(){
+		var str = $(this).attr('src').split('/');
+		var l = str.length;
+		var n = str[l-1].split('.');
+		map += n[0]+',';
+	});
+	var Map = map.split(',');
+	var l1 = l2 = l3 = l4 = l5 = l6 = l7 = l8 = l9 = l10 = l11 = l12 = result = '';
+	
+	for(var i = 0; i < 11; i++) {
+		l1 += Map[i]+',';
+	}
+	l1 = l1.substring(0,l1.length-1);
+	result += l1 + ',';
+	
+	for(var i = 11; i < 22; i++) {
+		l2 += Map[i]+',';
+	}
+	l2 = l2.substring(0,l2.length-1);
+	result += l2 + ',';
+	
+	for(var i = 22; i < 33; i++) {
+		l3 += Map[i]+',';
+	}
+	l3 = l3.substring(0,l3.length-1);
+	result += l3 + ',';
+	
+	for(var i = 33; i < 44; i++) {
+		l4 += Map[i]+',';
+	}
+	l4 = l4.substring(0,l4.length-1);
+	result += l4 + ',';
+	
+	for(var i = 44; i < 55; i++) {
+		l5 += Map[i]+',';
+	}
+	l5 = l5.substring(0,l5.length-1);
+	result += l5 + ',';
+	
+	for(var i = 55; i < 66; i++) {
+		l6 += Map[i]+',';
+	}
+	l6 = l6.substring(0,l6.length-1);
+	result += l6 + ',';
+	
+	for(var i = 66; i < 77; i++) {
+		l7 += Map[i]+',';
+	}
+	l7 = l7.substring(0,l7.length-1);
+	result += l7 + ',';
+	
+	for(var i = 77; i < 88; i++) {
+		l8 += Map[i]+',';
+	}
+	l8 = l8.substring(0,l8.length-1);
+	result += l8 + ',';
+	
+	for(var i = 88; i < 99; i++) {
+		l9 += Map[i]+',';
+	}
+	l9 = l9.substring(0,l9.length-1);
+	result += l9 + ',';
+	
+	for(var i = 99; i < 110; i++) {
+		l10 += Map[i]+',';
+	}
+	l10 = l10.substring(0,l10.length-1);
+	result += l10 + ',';
+	
+	for(var i = 110; i < 121; i++) {
+		l11 += Map[i]+',';
+	}
+	l11 = l11.substring(0,l11.length-1);
+	result += l11 + ',';
+	
+	for(var i = 121; i < 132; i++) {
+		l12 += Map[i]+',';
+	}
+	l12 = l12.substring(0,l12.length-1);
+	result += l12;
+	
+	$('#map').html(result);
+  }
+</script>	
+  </body>
+</html>
